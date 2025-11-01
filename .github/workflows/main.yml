@@ -1,0 +1,41 @@
+name: CI Build with n8n Failure Alert
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
+        run: npm run build
+
+      # ✅ Notify n8n if build fails
+      - name: Send failure alert to n8n
+        if: failure()
+        run: |
+          # Replace this with your actual n8n webhook URL
+          N8N_WEBHOOK_URL="https://n8n.yourdomain.com/webhook/ci-failure"
+
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"status\": \"failed\",
+              \"repository\": \"${{ github.repository }}\",
+              \"branch\": \"${{ github.ref_name }}\",
+              \"commit\": \"${{ github.sha }}\",
+              \"actor\": \"${{ github.actor }}\",
+              \"run_url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\",
+              \"message\": \"Build failed in CI pipeline.\"
+            }" \
+            $N8N_WEBHOOK_URL
