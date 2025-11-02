@@ -25,7 +25,7 @@ jobs:
         if: failure()
         run: |
           # Replace this with your actual n8n webhook URL
-          N8N_WEBHOOK_URL="http://localhost:5678/webhook/ci-build-webhook"
+          N8N_WEBHOOK_URL="https://n8n.srv1036052.hstgr.cloud/webhook/ci-build-webhook"
 
           curl -X POST \
             -H "Content-Type: application/json" \
