@@ -63,4 +63,4 @@ jobs:
     steps:
       - name: Notify n8n of Failure
         run: |
-          curl -X POST -H "Content-Type: application/json"           -d "{"status": "failed", "repository": "${{ github.repository }}", "branch": "${{ github.ref_name }}", "commit": "${{ github.sha }}", "actor": "${{ github.actor }}", "run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}", "message": "A job in the workflow failed."}"           https://your-n8n-domain.com/webhook/ci-failure
+          curl -X POST -H "Content-Type: application/json"           -d "{"status": "failed", "repository": "${{ github.repository }}", "branch": "${{ github.ref_name }}", "commit": "${{ github.sha }}", "actor": "${{ github.actor }}", "run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}", "message": "A job in the workflow failed."}"           https://n8n.srv1036052.hstgr.cloud/webhook-test/ci-build-webhook
