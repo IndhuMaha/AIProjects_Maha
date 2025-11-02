@@ -1,0 +1,66 @@
+
+name: CI Pipeline with Various Failure Cases
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test-build-failures:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Simulate Missing Dependency
+        run: |
+          echo "Simulating missing dependency error"
+          exit 1
+
+  lint-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run ESLint (Expected to Fail)
+        run: |
+          echo "Running ESLint check..."
+          echo "Error: Unexpected var, use let or const instead."
+          exit 1
+
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Tests
+        run: |
+          echo "Running tests..."
+          echo "Error: Cannot find module 'express'"
+          exit 1
+
+  build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Project (Expected to Fail)
+        run: |
+          echo "Building project..."
+          echo "npm ERR! missing script: build"
+          exit 1
+
+  notify-n8n:
+    needs: [test-build-failures, lint-job, test-job, build-job]
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Notify n8n of Failure
+        run: |
+          curl -X POST -H "Content-Type: application/json"           -d "{"status": "failed", "repository": "${{ github.repository }}", "branch": "${{ github.ref_name }}", "commit": "${{ github.sha }}", "actor": "${{ github.actor }}", "run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}", "message": "A job in the workflow failed."}"           https://your-n8n-domain.com/webhook/ci-failure
